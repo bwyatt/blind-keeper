@@ -10,6 +10,7 @@ export interface Run {
   createdAt: string;
   status: 'active' | 'completed';
   currentAnte: number;
+  anteDecrements: number;
   entries: AnteEntry[];
 }
 

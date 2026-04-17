@@ -10,6 +10,7 @@ function makeRun(overrides: Partial<Run> = {}): Run {
     createdAt: new Date().toISOString(),
     status: 'active',
     currentAnte: 1,
+    anteDecrements: 0,
     entries: [],
     ...overrides,
   };
@@ -193,10 +194,30 @@ describe('useAnteActions', () => {
     expect(updated.currentAnte).toBe(39); // capped at MAX_ANTE
   });
 
-  it('decrementAnte reduces currentAnte by 1', () => {
+  it('decrementAnte reduces currentAnte by 1 after confirmation', () => {
     const run = makeRun({ currentAnte: 5 });
     const updateRun = vi.fn();
     const endRun = vi.fn();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    const { result } = renderHook(() => useAnteActions(run, updateRun, endRun));
+
+    act(() => {
+      result.current.decrementAnte();
+    });
+
+    expect(window.confirm).toHaveBeenCalled();
+    expect(updateRun).toHaveBeenCalledOnce();
+    const updated = updateRun.mock.calls[0][0];
+    expect(updated.currentAnte).toBe(4);
+    expect(updated.anteDecrements).toBe(1);
+  });
+
+  it('decrementAnte allows decrementing from ante 1', () => {
+    const run = makeRun({ currentAnte: 1 });
+    const updateRun = vi.fn();
+    const endRun = vi.fn();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     const { result } = renderHook(() => useAnteActions(run, updateRun, endRun));
 
@@ -206,11 +227,28 @@ describe('useAnteActions', () => {
 
     expect(updateRun).toHaveBeenCalledOnce();
     const updated = updateRun.mock.calls[0][0];
-    expect(updated.currentAnte).toBe(4);
+    expect(updated.currentAnte).toBe(0);
+    expect(updated.anteDecrements).toBe(1);
   });
 
-  it('decrementAnte does nothing at ante 1', () => {
-    const run = makeRun({ currentAnte: 1 });
+  it('decrementAnte does nothing when confirmation is cancelled', () => {
+    const run = makeRun({ currentAnte: 5 });
+    const updateRun = vi.fn();
+    const endRun = vi.fn();
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+    const { result } = renderHook(() => useAnteActions(run, updateRun, endRun));
+
+    act(() => {
+      result.current.decrementAnte();
+    });
+
+    expect(window.confirm).toHaveBeenCalled();
+    expect(updateRun).not.toHaveBeenCalled();
+  });
+
+  it('decrementAnte does nothing after 2 decrements', () => {
+    const run = makeRun({ currentAnte: 5, anteDecrements: 2 });
     const updateRun = vi.fn();
     const endRun = vi.fn();
 

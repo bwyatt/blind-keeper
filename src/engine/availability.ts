@@ -38,12 +38,14 @@ export function getEligibleBosses(
   entries: AnteEntry[],
   currentAnte: number,
 ): BossBlind[] {
-  const isShowdownAnte = currentAnte % 8 === 0;
+  // Treat ante 0 and below the same as ante 1
+  const effectiveAnte = Math.max(currentAnte, 1);
+  const isShowdownAnte = effectiveAnte % 8 === 0;
 
   // Determine the pool based on ante type
   const pool = BOSSES.filter((boss) => {
     if (isShowdownAnte) return boss.isShowdown;
-    return !boss.isShowdown && boss.minAnte <= currentAnte;
+    return !boss.isShowdown && boss.minAnte <= effectiveAnte;
   });
 
   if (pool.length === 0) return [];

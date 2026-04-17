@@ -35,6 +35,7 @@ export function useAppState() {
         createdAt: new Date().toISOString(),
         status: 'active',
         currentAnte: 1,
+        anteDecrements: 0,
         entries: [],
       };
 

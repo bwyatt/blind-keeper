@@ -2,6 +2,7 @@ import { useCallback } from 'preact/hooks';
 import type { Run, AnteEntry } from '../types.ts';
 
 const MAX_ANTE = 39;
+const MAX_DECREMENTS = 2;
 
 export function useAnteActions(
   run: Run | null,
@@ -65,8 +66,14 @@ export function useAnteActions(
   );
 
   const decrementAnte = useCallback(() => {
-    if (!run || run.currentAnte <= 1) return;
-    updateRun({ ...run, currentAnte: run.currentAnte - 1 });
+    if (!run) return;
+    if ((run.anteDecrements ?? 0) >= MAX_DECREMENTS) return;
+    if (!window.confirm(`Go back to Ante ${run.currentAnte - 1}?`)) return;
+    updateRun({
+      ...run,
+      currentAnte: run.currentAnte - 1,
+      anteDecrements: (run.anteDecrements ?? 0) + 1,
+    });
   }, [run, updateRun]);
 
   return { addEntry, undoLastEntry, editEntry, decrementAnte };

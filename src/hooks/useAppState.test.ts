@@ -203,6 +203,7 @@ describe('useAppState', () => {
           createdAt: new Date().toISOString(),
           status: 'active',
           currentAnte: 5,
+          anteDecrements: 0,
           entries: [],
         },
       ],

@@ -17,6 +17,18 @@ describe('getEligibleBosses', () => {
     expect(result.every((b) => b.minAnte === 1 && !b.isShowdown)).toBe(true);
   });
 
+  it('returns ante 1 bosses for ante 0', () => {
+    const result = getEligibleBosses([], 0);
+    expect(result).toHaveLength(8);
+    expect(result.every((b) => b.minAnte === 1 && !b.isShowdown)).toBe(true);
+  });
+
+  it('returns ante 1 bosses for negative ante', () => {
+    const result = getEligibleBosses([], -1);
+    expect(result).toHaveLength(8);
+    expect(result.every((b) => b.minAnte === 1 && !b.isShowdown)).toBe(true);
+  });
+
   it('returns 13 bosses for ante 2 with no history', () => {
     const result = getEligibleBosses([], 2);
     expect(result).toHaveLength(13);

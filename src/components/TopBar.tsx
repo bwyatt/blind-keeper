@@ -28,7 +28,7 @@ export function TopBar({
         <button
           class="btn btn--icon"
           onClick={onDecrementAnte}
-          disabled={!run || run.currentAnte <= 1}
+          disabled={!run || (run.anteDecrements ?? 0) >= 2}
           aria-label="Decrement ante"
         >
           −1
