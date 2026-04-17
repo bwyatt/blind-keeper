@@ -8,14 +8,14 @@
 
 | ID | Requirement |
 | --- | --- |
-| FR-1 | Track the current Ante number in a Balatro run (Antes 1–39) |
+| FR-1 | Track the current Ante number in a Balatro run (Ante can go below 1 via voucher decrements; Antes 1–39 under normal progression) |
 | FR-2 | Select which boss blind was played (faced) in each Ante |
 | FR-3 | Record bosses that were rerolled before the faced boss (multiple rerolls per Ante supported) |
 | FR-4 | Display boss selection with both icon and name |
-| FR-5 | Only show eligible bosses for the current Ante based on game rules (minimum ante, appearance tracking, showdown rules) |
+| FR-5 | Only show eligible bosses for the current Ante based on game rules (minimum ante, appearance tracking, showdown rules). Antes at or below 0 use the same boss pool as Ante 1 |
 | FR-6 | Boss selection grid sorted by minimum Ante (ascending), then alphabetically within each group |
 | FR-7 | Selecting the faced boss auto-advances the Ante by 1 |
-| FR-8 | A "-1" button allows the user to reduce the current Ante (for Hieroglyph/Petroglyph vouchers) |
+| FR-8 | A "-1" button allows the user to reduce the current Ante (for Hieroglyph/Petroglyph vouchers). Limited to 2 uses per run. Requires confirmation before applying |
 | FR-9 | Repeated Antes produce separate sequential entries (not overwritten) |
 | FR-10 | Showdown Blinds appear only at Antes 8, 16, 24, 32; rerolling on a Showdown Ante always yields another Showdown Blind |
 
