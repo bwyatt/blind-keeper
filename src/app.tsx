@@ -1,100 +1,163 @@
-import { useState } from 'preact/hooks'
-import preactLogo from './assets/preact.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './app.css'
+import { useState, useEffect, useMemo } from 'preact/hooks';
+import type { AnteEntry } from './types.ts';
+import { useAppState } from './hooks/useAppState.ts';
+import { useAnteActions } from './hooks/useAnteActions.ts';
+import { useTheme } from './hooks/useTheme.ts';
+import { getEligibleBosses } from './engine/availability.ts';
+import { TopBar } from './components/TopBar.tsx';
+import { BossGrid } from './components/BossGrid.tsx';
+import { RunManager } from './components/RunManager.tsx';
+import { History } from './components/History.tsx';
+import { RerollList } from './components/RerollList.tsx';
+import './app.css';
 
 export function App() {
-  const [count, setCount] = useState(0)
+  const {
+    state,
+    activeRun,
+    createRun,
+    switchRun,
+    endRun,
+    deleteRun,
+    clearCompleted,
+    clearAll,
+    updateRun,
+  } = useAppState();
+  const { addEntry, undoLastEntry, editEntry, decrementAnte } =
+    useAnteActions(activeRun, updateRun, endRun);
+  const { theme, toggleTheme } = useTheme();
+
+  const [rerolledBosses, setRerolledBosses] = useState<string[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showRunManager, setShowRunManager] = useState(false);
+  const [editingEntryIndex, setEditingEntryIndex] = useState<number | null>(
+    null,
+  );
+
+  // Clear rerolledBosses when activeRun or ante changes
+  useEffect(() => {
+    setRerolledBosses([]);
+  }, [activeRun?.id, activeRun?.currentAnte]);
+
+  const eligibleBosses = useMemo(() => {
+    if (!activeRun) return [];
+    return getEligibleBosses(activeRun.entries, activeRun.currentAnte);
+  }, [activeRun?.entries, activeRun?.currentAnte]);
+
+  const handleFace = (bossId: string) => {
+    addEntry(bossId, rerolledBosses);
+    setRerolledBosses([]);
+  };
+
+  const handleReroll = (bossId: string) => {
+    setRerolledBosses((prev) => [...prev, bossId]);
+  };
+
+  const handleEditEntry = (index: number, entry: AnteEntry) => {
+    editEntry(index, entry);
+  };
+
+  const activeTab = showRunManager ? 'runs' : showHistory ? 'history' : 'grid';
 
   return (
-    <>
-      <section id="center">
-        <div class="hero">
-          <img src={heroImg} class="base" width="170" height="179" alt="" />
-          <img src={preactLogo} class="framework" alt="Preact logo" />
-          <img src={viteLogo} class="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/app.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button class="counter" onClick={() => setCount((count) => count + 1)}>
-          Count is {count}
+    <div class="app">
+      <TopBar
+        run={activeRun}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onDecrementAnte={decrementAnte}
+      />
+
+      <nav class="tab-bar" role="tablist" aria-label="Main navigation">
+        <button
+          class={`tab${activeTab === 'grid' ? ' tab--active' : ''}`}
+          role="tab"
+          aria-selected={activeTab === 'grid'}
+          onClick={() => {
+            setShowHistory(false);
+            setShowRunManager(false);
+          }}
+        >
+          Bosses
         </button>
-      </section>
+        <button
+          class={`tab${activeTab === 'history' ? ' tab--active' : ''}`}
+          role="tab"
+          aria-selected={activeTab === 'history'}
+          onClick={() => {
+            setShowHistory(true);
+            setShowRunManager(false);
+          }}
+          disabled={!activeRun}
+        >
+          History
+        </button>
+        <button
+          class={`tab${activeTab === 'runs' ? ' tab--active' : ''}`}
+          role="tab"
+          aria-selected={activeTab === 'runs'}
+          onClick={() => {
+            setShowRunManager(true);
+            setShowHistory(false);
+          }}
+        >
+          Runs
+        </button>
+      </nav>
 
-      <div class="ticks"></div>
+      <main class="main-content" role="tabpanel">
+        {activeTab === 'grid' && !activeRun && (
+          <div class="welcome">
+            <h1>Welcome to Blind Keeper</h1>
+            <p>Track your Balatro boss blinds across runs.</p>
+            <button
+              class="btn btn--primary"
+              onClick={() => setShowRunManager(true)}
+              aria-label="Create a new run"
+            >
+              New Run
+            </button>
+          </div>
+        )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg class="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img class="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://preactjs.com/" target="_blank">
-                <img class="button-icon" src={preactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg class="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg class="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg class="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg class="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg class="button-icon" role="presentation" aria-hidden="true">
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {activeTab === 'grid' && activeRun && (
+          <>
+            <RerollList rerolledBossIds={rerolledBosses} />
+            <BossGrid
+              eligibleBosses={eligibleBosses}
+              rerolledBosses={rerolledBosses}
+              onFace={handleFace}
+              onReroll={handleReroll}
+            />
+          </>
+        )}
 
-      <div class="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        {activeTab === 'history' && activeRun && (
+          <History
+            run={activeRun}
+            onUndo={undoLastEntry}
+            onEditEntry={handleEditEntry}
+            editingIndex={editingEntryIndex}
+            onSetEditingIndex={setEditingEntryIndex}
+          />
+        )}
+
+        {activeTab === 'runs' && (
+          <RunManager
+            state={state}
+            onCreateRun={createRun}
+            onSwitchRun={(id) => {
+              switchRun(id);
+              setShowRunManager(false);
+            }}
+            onEndRun={endRun}
+            onDeleteRun={deleteRun}
+            onClearCompleted={clearCompleted}
+            onClearAll={clearAll}
+            activeRunId={state.activeRunId}
+          />
+        )}
+      </main>
+    </div>
+  );
 }
