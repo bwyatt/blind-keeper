@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'preact/hooks';
+import { useState, useRef, useCallback, useEffect } from 'preact/hooks';
 import type { BossBlind } from '../data/bosses.ts';
 
 interface BossGridProps {
@@ -53,6 +53,11 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
     }
   }, []);
 
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => clearTimer();
+  }, [clearTimer]);
+
   const handlePointerDown = useCallback(() => {
     didLongPress.current = false;
     setPressing(true);
@@ -72,6 +77,11 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
   }, [boss.id, onFace, clearTimer]);
 
   const handlePointerCancel = useCallback(() => {
+    clearTimer();
+    setPressing(false);
+  }, [clearTimer]);
+
+  const handlePointerLeave = useCallback(() => {
     clearTimer();
     setPressing(false);
   }, [clearTimer]);
@@ -99,6 +109,7 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
+        onPointerLeave={handlePointerLeave}
         onContextMenu={(e: Event) => e.preventDefault()}
         onKeyDown={handleKeyDown}
         role="button"

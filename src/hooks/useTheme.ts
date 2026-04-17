@@ -13,7 +13,7 @@ function getCookie(name: string): string | undefined {
 }
 
 function setCookie(name: string, value: string) {
-  document.cookie = `${name}=${value}; SameSite=Lax; max-age=${COOKIE_MAX_AGE}`;
+  document.cookie = `${name}=${value}; path=/; SameSite=Lax; max-age=${COOKIE_MAX_AGE}`;
 }
 
 function detectTheme(): Theme {

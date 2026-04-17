@@ -17,11 +17,25 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-*,
-*::before,
-*::after {
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  a::before,
+  a::after,
+  button,
+  button::before,
+  button::after,
+  input,
+  input::before,
+  input::after,
+  select,
+  select::before,
+  select::after,
+  textarea,
+  textarea::before,
+  textarea::after {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
 }
