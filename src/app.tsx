@@ -7,7 +7,7 @@ import { TopBar } from './components/TopBar.tsx';
 import { BossGrid } from './components/BossGrid.tsx';
 import { RunManager } from './components/RunManager.tsx';
 import { History } from './components/History.tsx';
-import { BossPillList } from './components/RerollList.tsx';
+import { BossPillList } from './components/BossPillList.tsx';
 import './app.css';
 
 export function App() {
@@ -150,9 +150,15 @@ export function App() {
           <>
             <BossPillList
               label="Faced"
-              bossIds={activeRun.entries.map((e) => e.facedBoss)}
+              items={activeRun.entries.map((e) => ({
+                id: e.facedBoss,
+                subtitle: `(${e.anteNumber})`,
+              }))}
             />
-            <BossPillList label="Rerolled" bossIds={rerolledBosses} />
+            <BossPillList
+              label="Rerolled"
+              items={rerolledBosses.map((id) => ({ id }))}
+            />
             <BossGrid
               eligibleBosses={eligibleBosses}
               rerolledBosses={rerolledBosses}

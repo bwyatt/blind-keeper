@@ -398,6 +398,11 @@
   image-rendering: pixelated;
 }
 
+.boss-pill__subtitle {
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+
 /* ── Run Manager ─────────────────────────────────────────────── */
 
 .run-manager {
