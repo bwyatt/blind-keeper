@@ -7,10 +7,22 @@ const MAX_COMPLETED_RUNS = 10;
 
 const DEFAULT_STATE: AppState = { activeRunId: null, runs: [] };
 
+function isValidState(obj: unknown): obj is AppState {
+  if (!obj || typeof obj !== 'object') return false;
+  const s = obj as Record<string, unknown>;
+  return (
+    (s.activeRunId === null || typeof s.activeRunId === 'string') &&
+    Array.isArray(s.runs)
+  );
+}
+
 function loadState(): AppState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as AppState;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (isValidState(parsed)) return parsed;
+    }
   } catch {
     // Corrupt or missing data — fall back to default
   }

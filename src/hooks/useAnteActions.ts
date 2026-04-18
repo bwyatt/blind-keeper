@@ -67,12 +67,12 @@ export function useAnteActions(
 
   const decrementAnte = useCallback(() => {
     if (!run) return;
-    if ((run.anteDecrements ?? 0) >= MAX_DECREMENTS) return;
+    if (run.anteDecrements >= MAX_DECREMENTS) return;
     if (!window.confirm(`Go back to Ante ${run.currentAnte - 1}?`)) return;
     updateRun({
       ...run,
       currentAnte: run.currentAnte - 1,
-      anteDecrements: (run.anteDecrements ?? 0) + 1,
+      anteDecrements: run.anteDecrements + 1,
     });
   }, [run, updateRun]);
 

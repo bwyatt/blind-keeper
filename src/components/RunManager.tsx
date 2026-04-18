@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks';
-import type { AppState } from '../types.ts';
+import type { AppState, Run } from '../types.ts';
 
 interface RunManagerProps {
   state: AppState;
@@ -27,7 +27,20 @@ export function RunManager({
   const activeRuns = state.runs.filter((r) => r.status === 'active');
   const completedRuns = state.runs.filter((r) => r.status === 'completed');
 
+  const MAX_ACTIVE_RUNS = 10;
+
   const handleCreate = () => {
+    if (activeRuns.length >= MAX_ACTIVE_RUNS) {
+      const choice = window.confirm(
+        `You have ${MAX_ACTIVE_RUNS} active runs (the maximum). Press OK to delete the oldest active run, or Cancel to go back.`,
+      );
+      if (!choice) return;
+      // Delete the oldest active run (by creation date)
+      const oldest = [...activeRuns].sort((a, b) =>
+        a.createdAt.localeCompare(b.createdAt),
+      )[0];
+      if (oldest) onDeleteRun(oldest.id);
+    }
     const name = newName.trim() || `Run ${state.runs.length + 1}`;
     onCreateRun(name);
     setNewName('');
@@ -41,6 +54,15 @@ export function RunManager({
     if (window.confirm('Delete all completed runs?')) {
       onClearCompleted();
     }
+  };
+
+  const handleEndRun = (run: Run) => {
+    if (run.currentAnte < 39) {
+      if (!window.confirm(`End "${run.name}" at Ante ${run.currentAnte}? This run hasn't reached Ante 39.`)) {
+        return;
+      }
+    }
+    onEndRun(run.id);
   };
 
   const handleClearAll = () => {
@@ -108,7 +130,7 @@ export function RunManager({
                   )}
                   <button
                     class="btn"
-                    onClick={() => onEndRun(run.id)}
+                    onClick={() => handleEndRun(run)}
                     aria-label={`End ${run.name}`}
                   >
                     End

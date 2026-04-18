@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo } from 'preact/hooks';
-import type { AnteEntry } from './types.ts';
+import { useState, useEffect, useMemo, useRef } from 'preact/hooks';
 import { useAppState } from './hooks/useAppState.ts';
 import { useAnteActions } from './hooks/useAnteActions.ts';
 import { useTheme } from './hooks/useTheme.ts';
@@ -53,11 +52,18 @@ export function App() {
     setRerolledBosses((prev) => [...prev, bossId]);
   };
 
-  const handleEditEntry = (index: number, entry: AnteEntry) => {
-    editEntry(index, entry);
-  };
-
   const activeTab = showRunManager ? 'runs' : showHistory ? 'history' : 'grid';
+
+  // aria-live announcement
+  const prevAnteRef = useRef(activeRun?.currentAnte ?? null);
+  const [announcement, setAnnouncement] = useState('');
+  useEffect(() => {
+    const currentAnte = activeRun?.currentAnte ?? null;
+    if (currentAnte !== null && prevAnteRef.current !== null && currentAnte !== prevAnteRef.current) {
+      setAnnouncement(`Ante ${currentAnte}`);
+    }
+    prevAnteRef.current = currentAnte;
+  }, [activeRun?.currentAnte]);
 
   return (
     <div class="app">
@@ -105,6 +111,10 @@ export function App() {
         </button>
       </nav>
 
+      <div class="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </div>
+
       <main class="main-content" role="tabpanel">
         {activeTab === 'grid' && !activeRun && (
           <div class="welcome">
@@ -136,7 +146,7 @@ export function App() {
           <History
             run={activeRun}
             onUndo={undoLastEntry}
-            onEditEntry={handleEditEntry}
+            onEditEntry={editEntry}
             editingIndex={editingEntryIndex}
             onSetEditingIndex={setEditingEntryIndex}
           />

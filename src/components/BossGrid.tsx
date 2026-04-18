@@ -41,10 +41,13 @@ interface BossCardProps {
   onReroll: (bossId: string) => void;
 }
 
+const LONG_PRESS_MOVE_THRESHOLD = 10;
+
 function BossCard({ boss, onFace, onReroll }: BossCardProps) {
   const [pressing, setPressing] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
+  const startPos = useRef<{ x: number; y: number } | null>(null);
 
   const clearTimer = useCallback(() => {
     if (timerRef.current !== null) {
@@ -58,8 +61,9 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
     return () => clearTimer();
   }, [clearTimer]);
 
-  const handlePointerDown = useCallback(() => {
+  const handlePointerDown = useCallback((e: PointerEvent) => {
     didLongPress.current = false;
+    startPos.current = { x: e.clientX, y: e.clientY };
     setPressing(true);
     timerRef.current = setTimeout(() => {
       didLongPress.current = true;
@@ -67,6 +71,16 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
       onReroll(boss.id);
     }, 500);
   }, [boss.id, onReroll]);
+
+  const handlePointerMove = useCallback((e: PointerEvent) => {
+    if (!startPos.current) return;
+    const dx = e.clientX - startPos.current.x;
+    const dy = e.clientY - startPos.current.y;
+    if (Math.sqrt(dx * dx + dy * dy) > LONG_PRESS_MOVE_THRESHOLD) {
+      clearTimer();
+      setPressing(false);
+    }
+  }, [clearTimer]);
 
   const handlePointerUp = useCallback(() => {
     clearTimer();
@@ -107,6 +121,7 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
       <div
         class="boss-card__touch"
         onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
         onPointerLeave={handlePointerLeave}
