@@ -2,6 +2,7 @@ import { BOSS_MAP } from '../data/bosses.ts';
 
 export interface BossPillItem {
   id: string;
+  key?: string;
   subtitle?: string;
 }
 
@@ -16,8 +17,8 @@ export function BossPillList({ label, items }: BossPillListProps) {
   return (
     <div class="boss-pill-list" aria-label={label}>
       <span class="boss-pill-list__label">{label}:</span>
-      {items.map((item) => (
-        <span key={item.id} class="boss-pill">
+      {items.map((item, i) => (
+        <span key={item.key ?? `${item.id}-${i}`} class="boss-pill">
           <img
             class="boss-pill__icon"
             src={`/images/bosses/${item.id}.png`}

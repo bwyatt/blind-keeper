@@ -8,7 +8,10 @@ import { BossGrid } from './components/BossGrid.tsx';
 import { RunManager } from './components/RunManager.tsx';
 import { History } from './components/History.tsx';
 import { BossPillList } from './components/BossPillList.tsx';
+import { About } from './components/About.tsx';
 import './app.css';
+
+type Tab = 'grid' | 'history' | 'runs' | 'about';
 
 export function App() {
   const {
@@ -27,9 +30,7 @@ export function App() {
   const { theme, toggleTheme } = useTheme();
 
   const [rerolledBosses, setRerolledBosses] = useState<string[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
-  const [showRunManager, setShowRunManager] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>('grid');
   const [editingEntryIndex, setEditingEntryIndex] = useState<number | null>(
     null,
   );
@@ -52,8 +53,6 @@ export function App() {
   const handleReroll = (bossId: string) => {
     setRerolledBosses((prev) => [...prev, bossId]);
   };
-
-  const activeTab = showAbout ? 'about' : showRunManager ? 'runs' : showHistory ? 'history' : 'grid';
 
   // aria-live announcement
   const prevAnteRef = useRef(activeRun?.currentAnte ?? null);
@@ -80,11 +79,7 @@ export function App() {
           class={`tab${activeTab === 'grid' ? ' tab--active' : ''}`}
           role="tab"
           aria-selected={activeTab === 'grid'}
-          onClick={() => {
-            setShowHistory(false);
-            setShowRunManager(false);
-            setShowAbout(false);
-          }}
+          onClick={() => setActiveTab('grid')}
         >
           Bosses
         </button>
@@ -92,11 +87,7 @@ export function App() {
           class={`tab${activeTab === 'history' ? ' tab--active' : ''}`}
           role="tab"
           aria-selected={activeTab === 'history'}
-          onClick={() => {
-            setShowHistory(true);
-            setShowRunManager(false);
-            setShowAbout(false);
-          }}
+          onClick={() => setActiveTab('history')}
           disabled={!activeRun}
         >
           History
@@ -105,11 +96,7 @@ export function App() {
           class={`tab${activeTab === 'runs' ? ' tab--active' : ''}`}
           role="tab"
           aria-selected={activeTab === 'runs'}
-          onClick={() => {
-            setShowRunManager(true);
-            setShowHistory(false);
-            setShowAbout(false);
-          }}
+          onClick={() => setActiveTab('runs')}
         >
           Runs
         </button>
@@ -117,11 +104,7 @@ export function App() {
           class={`tab${activeTab === 'about' ? ' tab--active' : ''}`}
           role="tab"
           aria-selected={activeTab === 'about'}
-          onClick={() => {
-            setShowAbout(true);
-            setShowRunManager(false);
-            setShowHistory(false);
-          }}
+          onClick={() => setActiveTab('about')}
         >
           About
         </button>
@@ -138,7 +121,7 @@ export function App() {
             <p>Track your Balatro boss blinds across runs.</p>
             <button
               class="btn btn--primary"
-              onClick={() => setShowRunManager(true)}
+              onClick={() => setActiveTab('runs')}
               aria-label="Create a new run"
             >
               New Run
@@ -184,7 +167,7 @@ export function App() {
             onCreateRun={createRun}
             onSwitchRun={(id) => {
               switchRun(id);
-              setShowRunManager(false);
+              setActiveTab('grid');
             }}
             onEndRun={endRun}
             onDeleteRun={deleteRun}
@@ -194,26 +177,7 @@ export function App() {
           />
         )}
 
-        {activeTab === 'about' && (
-          <div class="about">
-            <h2>Blind Keeper</h2>
-            <p>
-              A companion tracker for Balatro boss blinds. Keep track of which
-              bosses you've faced and rerolled across your runs.
-            </p>
-            <p>
-              Made with ❤️ for the Balatro community. Contributions and feedback are welcome!
-            </p>
-            <a
-              class="btn btn--primary"
-              href="https://github.com/bwyatt/blind-keeper"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View on GitHub
-            </a>
-          </div>
-        )}
+        {activeTab === 'about' && <About />}
       </main>
     </div>
   );
