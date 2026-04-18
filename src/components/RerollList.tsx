@@ -12,6 +12,13 @@ export function RerollList({ rerolledBossIds }: RerollListProps) {
       <span class="reroll-list__label">Rerolled:</span>
       {rerolledBossIds.map((id) => (
         <span key={id} class="reroll-list__pill">
+          <img
+            class="reroll-list__icon"
+            src={`/images/bosses/${id}.png`}
+            alt=""
+            width={20}
+            height={20}
+          />
           {BOSS_MAP[id]?.name ?? id}
         </span>
       ))}

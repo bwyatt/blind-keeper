@@ -115,6 +115,13 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
       class={`boss-card${pressing ? ' boss-card--pressing' : ''}`}
       role="gridcell"
     >
+      <img
+        class="boss-card__icon"
+        src={`/images/bosses/${boss.id}.png`}
+        alt=""
+        width={64}
+        height={64}
+      />
       <span class="boss-card__name">{boss.name}</span>
 
       {/* Mobile: touch area overlay */}
