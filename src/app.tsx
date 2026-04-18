@@ -7,7 +7,7 @@ import { TopBar } from './components/TopBar.tsx';
 import { BossGrid } from './components/BossGrid.tsx';
 import { RunManager } from './components/RunManager.tsx';
 import { History } from './components/History.tsx';
-import { RerollList } from './components/RerollList.tsx';
+import { BossPillList } from './components/RerollList.tsx';
 import './app.css';
 
 export function App() {
@@ -132,7 +132,11 @@ export function App() {
 
         {activeTab === 'grid' && activeRun && (
           <>
-            <RerollList rerolledBossIds={rerolledBosses} />
+            <BossPillList
+              label="Faced"
+              bossIds={activeRun.entries.map((e) => e.facedBoss)}
+            />
+            <BossPillList label="Rerolled" bossIds={rerolledBosses} />
             <BossGrid
               eligibleBosses={eligibleBosses}
               rerolledBosses={rerolledBosses}

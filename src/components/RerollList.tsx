@@ -1,19 +1,20 @@
 import { BOSS_MAP } from '../data/bosses.ts';
 
-interface RerollListProps {
-  rerolledBossIds: string[];
+interface BossPillListProps {
+  label: string;
+  bossIds: string[];
 }
 
-export function RerollList({ rerolledBossIds }: RerollListProps) {
-  if (rerolledBossIds.length === 0) return null;
+export function BossPillList({ label, bossIds }: BossPillListProps) {
+  if (bossIds.length === 0) return null;
 
   return (
-    <div class="reroll-list" aria-label="Rerolled bosses">
-      <span class="reroll-list__label">Rerolled:</span>
-      {rerolledBossIds.map((id) => (
-        <span key={id} class="reroll-list__pill">
+    <div class="boss-pill-list" aria-label={label}>
+      <span class="boss-pill-list__label">{label}:</span>
+      {bossIds.map((id) => (
+        <span key={id} class="boss-pill">
           <img
-            class="reroll-list__icon"
+            class="boss-pill__icon"
             src={`/images/bosses/${id}.png`}
             alt=""
             width={20}

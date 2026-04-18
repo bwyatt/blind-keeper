@@ -337,23 +337,22 @@
   }
 }
 
-/* ── Reroll List ─────────────────────────────────────────────── */
+/* ── Boss Pill List ──────────────────────────────────────────── */
 
-.reroll-list {
+.boss-pill-list {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 0;
-  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
-.reroll-list__label {
+.boss-pill-list__label {
   font-size: 0.85rem;
   color: var(--text-secondary);
 }
 
-.reroll-list__pill {
+.boss-pill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -365,7 +364,7 @@
   font-size: 0.8rem;
 }
 
-.reroll-list__icon {
+.boss-pill__icon {
   width: 20px;
   height: 20px;
   image-rendering: pixelated;
