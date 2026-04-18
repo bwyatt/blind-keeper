@@ -29,6 +29,7 @@ export function App() {
   const [rerolledBosses, setRerolledBosses] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [showRunManager, setShowRunManager] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [editingEntryIndex, setEditingEntryIndex] = useState<number | null>(
     null,
   );
@@ -52,7 +53,7 @@ export function App() {
     setRerolledBosses((prev) => [...prev, bossId]);
   };
 
-  const activeTab = showRunManager ? 'runs' : showHistory ? 'history' : 'grid';
+  const activeTab = showAbout ? 'about' : showRunManager ? 'runs' : showHistory ? 'history' : 'grid';
 
   // aria-live announcement
   const prevAnteRef = useRef(activeRun?.currentAnte ?? null);
@@ -82,6 +83,7 @@ export function App() {
           onClick={() => {
             setShowHistory(false);
             setShowRunManager(false);
+            setShowAbout(false);
           }}
         >
           Bosses
@@ -93,6 +95,7 @@ export function App() {
           onClick={() => {
             setShowHistory(true);
             setShowRunManager(false);
+            setShowAbout(false);
           }}
           disabled={!activeRun}
         >
@@ -105,9 +108,22 @@ export function App() {
           onClick={() => {
             setShowRunManager(true);
             setShowHistory(false);
+            setShowAbout(false);
           }}
         >
           Runs
+        </button>
+        <button
+          class={`tab${activeTab === 'about' ? ' tab--active' : ''}`}
+          role="tab"
+          aria-selected={activeTab === 'about'}
+          onClick={() => {
+            setShowAbout(true);
+            setShowRunManager(false);
+            setShowHistory(false);
+          }}
+        >
+          About
         </button>
       </nav>
 
@@ -170,6 +186,27 @@ export function App() {
             onClearAll={clearAll}
             activeRunId={state.activeRunId}
           />
+        )}
+
+        {activeTab === 'about' && (
+          <div class="about">
+            <h2>Blind Keeper</h2>
+            <p>
+              A companion tracker for Balatro boss blinds. Keep track of which
+              bosses you've faced and rerolled across your runs.
+            </p>
+            <p>
+              Made with ❤️ for the Balatro community. Contributions and feedback are welcome!
+            </p>
+            <a
+              class="btn btn--primary"
+              href="https://github.com/bwyatt/blind-keeper"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View on GitHub
+            </a>
+          </div>
         )}
       </main>
     </div>
