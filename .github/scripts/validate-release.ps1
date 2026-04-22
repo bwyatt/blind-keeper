@@ -17,8 +17,13 @@ $prVersion = (Get-Content './package.json' -Raw | ConvertFrom-Json).version
 Write-Host "PR version: $prVersion"
 
 # --- Read version from main branch ---
+$savedErrorAction = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
 $mainPackageJson = git show origin/main:package.json 2>$null
-if ($LASTEXITCODE -ne 0) {
+$gitExitCode = $LASTEXITCODE
+$ErrorActionPreference = $savedErrorAction
+
+if ($gitExitCode -ne 0) {
     # First release — no package.json on main yet
     $mainVersion = '0.0.0'
     Write-Host "main version: (none, treating as $mainVersion)"
