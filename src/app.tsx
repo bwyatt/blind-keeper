@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'preact/hooks';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'preact/hooks';
 import { useAppState } from './hooks/useAppState.ts';
 import { useAnteActions } from './hooks/useAnteActions.ts';
 import { useTheme } from './hooks/useTheme.ts';
@@ -7,8 +7,19 @@ import { TopBar } from './components/TopBar.tsx';
 import { BossGrid } from './components/BossGrid.tsx';
 import { RunManager } from './components/RunManager.tsx';
 import { History } from './components/History.tsx';
-import { RerollList } from './components/RerollList.tsx';
+import { BossPillList } from './components/BossPillList.tsx';
+import { About } from './components/About.tsx';
 import './app.css';
+
+type Tab = 'grid' | 'history' | 'runs' | 'about';
+
+const ALL_TABS: Tab[] = ['grid', 'history', 'runs', 'about'];
+const TAB_LABELS: Record<Tab, string> = {
+  grid: 'Bosses',
+  history: 'History',
+  runs: 'Runs',
+  about: 'About',
+};
 
 export function App() {
   const {
@@ -27,8 +38,7 @@ export function App() {
   const { theme, toggleTheme } = useTheme();
 
   const [rerolledBosses, setRerolledBosses] = useState<string[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
-  const [showRunManager, setShowRunManager] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>('grid');
   const [editingEntryIndex, setEditingEntryIndex] = useState<number | null>(
     null,
   );
@@ -52,7 +62,39 @@ export function App() {
     setRerolledBosses((prev) => [...prev, bossId]);
   };
 
-  const activeTab = showRunManager ? 'runs' : showHistory ? 'history' : 'grid';
+  const disabledTabs = useMemo<Set<Tab>>(
+    () => (activeRun ? new Set() : new Set<Tab>(['history'])),
+    [activeRun],
+  );
+
+  const handleTabKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      const navigableTabs = ALL_TABS.filter((t) => !disabledTabs.has(t));
+      const currentIndex = navigableTabs.indexOf(activeTab);
+      let nextIndex = currentIndex;
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        nextIndex = (currentIndex + 1) % navigableTabs.length;
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        nextIndex = (currentIndex - 1 + navigableTabs.length) % navigableTabs.length;
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        nextIndex = 0;
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        nextIndex = navigableTabs.length - 1;
+      }
+
+      if (nextIndex !== currentIndex) {
+        const nextTab = navigableTabs[nextIndex];
+        setActiveTab(nextTab);
+        document.getElementById(`tab-${nextTab}`)?.focus();
+      }
+    },
+    [activeTab, disabledTabs],
+  );
 
   // aria-live announcement
   const prevAnteRef = useRef(activeRun?.currentAnte ?? null);
@@ -75,54 +117,36 @@ export function App() {
       />
 
       <nav class="tab-bar" role="tablist" aria-label="Main navigation">
-        <button
-          class={`tab${activeTab === 'grid' ? ' tab--active' : ''}`}
-          role="tab"
-          aria-selected={activeTab === 'grid'}
-          onClick={() => {
-            setShowHistory(false);
-            setShowRunManager(false);
-          }}
-        >
-          Bosses
-        </button>
-        <button
-          class={`tab${activeTab === 'history' ? ' tab--active' : ''}`}
-          role="tab"
-          aria-selected={activeTab === 'history'}
-          onClick={() => {
-            setShowHistory(true);
-            setShowRunManager(false);
-          }}
-          disabled={!activeRun}
-        >
-          History
-        </button>
-        <button
-          class={`tab${activeTab === 'runs' ? ' tab--active' : ''}`}
-          role="tab"
-          aria-selected={activeTab === 'runs'}
-          onClick={() => {
-            setShowRunManager(true);
-            setShowHistory(false);
-          }}
-        >
-          Runs
-        </button>
+        {ALL_TABS.map((tab) => (
+          <button
+            key={tab}
+            id={`tab-${tab}`}
+            class={`tab${activeTab === tab ? ' tab--active' : ''}`}
+            role="tab"
+            aria-selected={activeTab === tab}
+            aria-controls={`tabpanel-${tab}`}
+            tabIndex={activeTab === tab ? 0 : -1}
+            disabled={disabledTabs.has(tab)}
+            onClick={() => setActiveTab(tab)}
+            onKeyDown={handleTabKeyDown}
+          >
+            {TAB_LABELS[tab]}
+          </button>
+        ))}
       </nav>
 
       <div class="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>
 
-      <main class="main-content" role="tabpanel">
+      <main class="main-content" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`} tabIndex={0}>
         {activeTab === 'grid' && !activeRun && (
           <div class="welcome">
             <h1>Welcome to Blind Keeper</h1>
             <p>Track your Balatro boss blinds across runs.</p>
             <button
               class="btn btn--primary"
-              onClick={() => setShowRunManager(true)}
+              onClick={() => setActiveTab('runs')}
               aria-label="Create a new run"
             >
               New Run
@@ -132,7 +156,17 @@ export function App() {
 
         {activeTab === 'grid' && activeRun && (
           <>
-            <RerollList rerolledBossIds={rerolledBosses} />
+            <BossPillList
+              label="Faced"
+              items={activeRun.entries.map((e) => ({
+                id: e.facedBoss,
+                subtitle: `(${e.anteNumber})`,
+              }))}
+            />
+            <BossPillList
+              label="Rerolled"
+              items={rerolledBosses.map((id) => ({ id }))}
+            />
             <BossGrid
               eligibleBosses={eligibleBosses}
               rerolledBosses={rerolledBosses}
@@ -158,7 +192,7 @@ export function App() {
             onCreateRun={createRun}
             onSwitchRun={(id) => {
               switchRun(id);
-              setShowRunManager(false);
+              setActiveTab('grid');
             }}
             onEndRun={endRun}
             onDeleteRun={deleteRun}
@@ -167,6 +201,8 @@ export function App() {
             activeRunId={state.activeRunId}
           />
         )}
+
+        {activeTab === 'about' && <About />}
       </main>
     </div>
   );

@@ -222,6 +222,34 @@
   margin: 0;
 }
 
+/* ── About ───────────────────────────────────────────────────── */
+
+.about {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.about h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.about p {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.about .btn {
+  align-self: center;
+  text-decoration: none;
+}
+
 /* ── Boss Grid ───────────────────────────────────────────────── */
 
 .boss-grid {
@@ -264,9 +292,18 @@
   }
 }
 
+.boss-card__icon {
+  display: block;
+  margin: 12px auto 0;
+  width: 64px;
+  height: 64px;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
 .boss-card__name {
   display: block;
-  padding: 16px 12px;
+  padding: 8px 12px;
   font-weight: 500;
   text-align: center;
   pointer-events: none;
@@ -328,29 +365,46 @@
   }
 }
 
-/* ── Reroll List ─────────────────────────────────────────────── */
+/* ── Boss Pill List ──────────────────────────────────────────── */
 
-.reroll-list {
+.boss-pill-list {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 0;
-  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
-.reroll-list__label {
+.boss-pill-list:last-of-type {
+  margin-bottom: 12px;
+}
+
+.boss-pill-list__label {
   font-size: 0.85rem;
   color: var(--text-secondary);
 }
 
-.reroll-list__pill {
-  display: inline-block;
-  padding: 4px 10px;
+.boss-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 4px 6px;
   border-radius: 16px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
   font-size: 0.8rem;
+}
+
+.boss-pill__icon {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+}
+
+.boss-pill__subtitle {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
 }
 
 /* ── Run Manager ─────────────────────────────────────────────── */
