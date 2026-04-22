@@ -17,9 +17,15 @@ $prVersion = (Get-Content './package.json' -Raw | ConvertFrom-Json).version
 Write-Host "PR version: $prVersion"
 
 # --- Read version from main branch ---
-$mainPackageJson = git show origin/main:package.json
-$mainVersion = ($mainPackageJson | ConvertFrom-Json).version
-Write-Host "main version: $mainVersion"
+$mainPackageJson = git show origin/main:package.json 2>$null
+if ($LASTEXITCODE -ne 0) {
+    # First release — no package.json on main yet
+    $mainVersion = '0.0.0'
+    Write-Host "main version: (none, treating as $mainVersion)"
+} else {
+    $mainVersion = ($mainPackageJson | ConvertFrom-Json).version
+    Write-Host "main version: $mainVersion"
+}
 
 # --- Check 1: Version must be incremented ---
 $prSemVer = [System.Version]$prVersion
