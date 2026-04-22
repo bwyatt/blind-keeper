@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'preact/hooks';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'preact/hooks';
 import { useAppState } from './hooks/useAppState.ts';
 import { useAnteActions } from './hooks/useAnteActions.ts';
 import { useTheme } from './hooks/useTheme.ts';
@@ -12,6 +12,14 @@ import { About } from './components/About.tsx';
 import './app.css';
 
 type Tab = 'grid' | 'history' | 'runs' | 'about';
+
+const ALL_TABS: Tab[] = ['grid', 'history', 'runs', 'about'];
+const TAB_LABELS: Record<Tab, string> = {
+  grid: 'Bosses',
+  history: 'History',
+  runs: 'Runs',
+  about: 'About',
+};
 
 export function App() {
   const {
@@ -54,6 +62,40 @@ export function App() {
     setRerolledBosses((prev) => [...prev, bossId]);
   };
 
+  const disabledTabs = useMemo<Set<Tab>>(
+    () => (activeRun ? new Set() : new Set<Tab>(['history'])),
+    [activeRun],
+  );
+
+  const handleTabKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      const navigableTabs = ALL_TABS.filter((t) => !disabledTabs.has(t));
+      const currentIndex = navigableTabs.indexOf(activeTab);
+      let nextIndex = currentIndex;
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        nextIndex = (currentIndex + 1) % navigableTabs.length;
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        nextIndex = (currentIndex - 1 + navigableTabs.length) % navigableTabs.length;
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        nextIndex = 0;
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        nextIndex = navigableTabs.length - 1;
+      }
+
+      if (nextIndex !== currentIndex) {
+        const nextTab = navigableTabs[nextIndex];
+        setActiveTab(nextTab);
+        document.getElementById(`tab-${nextTab}`)?.focus();
+      }
+    },
+    [activeTab, disabledTabs],
+  );
+
   // aria-live announcement
   const prevAnteRef = useRef(activeRun?.currentAnte ?? null);
   const [announcement, setAnnouncement] = useState('');
@@ -75,46 +117,29 @@ export function App() {
       />
 
       <nav class="tab-bar" role="tablist" aria-label="Main navigation">
-        <button
-          class={`tab${activeTab === 'grid' ? ' tab--active' : ''}`}
-          role="tab"
-          aria-selected={activeTab === 'grid'}
-          onClick={() => setActiveTab('grid')}
-        >
-          Bosses
-        </button>
-        <button
-          class={`tab${activeTab === 'history' ? ' tab--active' : ''}`}
-          role="tab"
-          aria-selected={activeTab === 'history'}
-          onClick={() => setActiveTab('history')}
-          disabled={!activeRun}
-        >
-          History
-        </button>
-        <button
-          class={`tab${activeTab === 'runs' ? ' tab--active' : ''}`}
-          role="tab"
-          aria-selected={activeTab === 'runs'}
-          onClick={() => setActiveTab('runs')}
-        >
-          Runs
-        </button>
-        <button
-          class={`tab${activeTab === 'about' ? ' tab--active' : ''}`}
-          role="tab"
-          aria-selected={activeTab === 'about'}
-          onClick={() => setActiveTab('about')}
-        >
-          About
-        </button>
+        {ALL_TABS.map((tab) => (
+          <button
+            key={tab}
+            id={`tab-${tab}`}
+            class={`tab${activeTab === tab ? ' tab--active' : ''}`}
+            role="tab"
+            aria-selected={activeTab === tab}
+            aria-controls={`tabpanel-${tab}`}
+            tabIndex={activeTab === tab ? 0 : -1}
+            disabled={disabledTabs.has(tab)}
+            onClick={() => setActiveTab(tab)}
+            onKeyDown={handleTabKeyDown}
+          >
+            {TAB_LABELS[tab]}
+          </button>
+        ))}
       </nav>
 
       <div class="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>
 
-      <main class="main-content" role="tabpanel">
+      <main class="main-content" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`} tabIndex={0}>
         {activeTab === 'grid' && !activeRun && (
           <div class="welcome">
             <h1>Welcome to Blind Keeper</h1>
