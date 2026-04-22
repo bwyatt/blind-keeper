@@ -89,4 +89,5 @@ if ($errors -gt 0) {
 } else {
     Write-Host ""
     Write-Host "Release validation passed."
+    exit 0
 }
