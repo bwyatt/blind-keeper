@@ -3,6 +3,7 @@ name: CI
 on:
   pull_request:
     branches: [develop, main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,3 +21,18 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  release-check:
+    if: github.base_ref == 'main' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch origin main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate release readiness
+        shell: pwsh
+        run: .github/scripts/validate-release.ps1

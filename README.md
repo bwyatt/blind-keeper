@@ -31,6 +31,16 @@ npm run typecheck  # TypeScript type checking only
 - **Styling:** Plain CSS with custom properties
 - **Hosting:** GitHub Pages
 
+## Releases
+
+This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). All notable changes are documented in [CHANGELOG.md](CHANGELOG.md), which follows the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
+
+Releases are created automatically when code is merged to `main`. PRs targeting `main` must include:
+
+- A version bump in `package.json`
+- A matching versioned entry in `CHANGELOG.md`
+- An empty `[Unreleased]` section (all changes moved to the versioned entry)
+
 ## Documentation
 
 - [Architecture](docs/Architecture.md) — Technical design and data model

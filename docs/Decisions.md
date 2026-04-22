@@ -59,3 +59,17 @@ All 25 questions have been addressed. The decisions above are reflected in the f
 - [Architecture.md](./Architecture.md) — Technical architecture and data model
 - [Requirements.md](./Requirements.md) — Functional, technical, and non-functional requirements
 - [Implementation-Plan.md](./Implementation-Plan.md) — Phased implementation plan with exit criteria
+
+## Release Pipeline Decisions
+
+| # | Topic | Decision |
+| --- | --- | --- |
+| RP-1 | Versioning | SemVer (MAJOR.MINOR.PATCH) |
+| RP-2 | Version bump | Manual — developer updates `package.json` and `CHANGELOG.md` in the PR to `main` |
+| RP-3 | Git tagging | Auto-tag on release (e.g., `v1.0.0`) |
+| RP-4 | Release notes source | Parsed from CHANGELOG.md — extract the section for the version being released |
+| RP-5 | Release publishing | Auto-publish immediately (not draft) |
+| RP-6 | Workflow structure | Combine deploy (GitHub Pages) + release (GitHub Release + tag) into one workflow |
+| RP-7 | Initial changelog | Start with a `1.0.0` entry summarizing current functionality |
+| RP-8 | PR-to-main checks | Version increment, changelog entry match, no Unreleased content, standard CI |
+| RP-9 | Scripts | PowerShell (cross-platform via `pwsh`) |
