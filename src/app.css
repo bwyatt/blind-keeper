@@ -375,6 +375,10 @@
   flex-wrap: wrap;
 }
 
+.boss-pill-list:last-of-type {
+  margin-bottom: 12px;
+}
+
 .boss-pill-list__label {
   font-size: 0.85rem;
   color: var(--text-secondary);
@@ -400,7 +404,7 @@
 
 .boss-pill__subtitle {
   font-size: 0.7rem;
-  opacity: 0.6;
+  color: var(--text-secondary);
 }
 
 /* ── Run Manager ─────────────────────────────────────────────── */

@@ -15,10 +15,10 @@ export function BossPillList({ label, items }: BossPillListProps) {
   if (items.length === 0) return null;
 
   return (
-    <div class="boss-pill-list" aria-label={label}>
+    <div class="boss-pill-list" role="list" aria-label={label}>
       <span class="boss-pill-list__label">{label}:</span>
       {items.map((item, i) => (
-        <span key={item.key ?? `${item.id}-${i}`} class="boss-pill">
+        <span key={item.key ?? `${item.id}-${i}`} class="boss-pill" role="listitem">
           {BOSS_MAP[item.id] && (
             <img
               class="boss-pill__icon"

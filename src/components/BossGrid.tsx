@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'preact/hooks';
-import type { BossBlind } from '../data/bosses.ts';
+import { BOSS_MAP, type BossBlind } from '../data/bosses.ts';
 
 interface BossGridProps {
   eligibleBosses: BossBlind[];
@@ -115,13 +115,15 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
       class={`boss-card${pressing ? ' boss-card--pressing' : ''}`}
       role="gridcell"
     >
-      <img
-        class="boss-card__icon"
-        src={`/images/bosses/${boss.id}.png`}
-        alt=""
-        width={64}
-        height={64}
-      />
+      {boss.id in BOSS_MAP && (
+        <img
+          class="boss-card__icon"
+          src={`/images/bosses/${boss.id}.png`}
+          alt=""
+          width={64}
+          height={64}
+        />
+      )}
       <span class="boss-card__name">{boss.name}</span>
 
       {/* Mobile: touch area overlay */}
