@@ -139,54 +139,76 @@ export function App() {
         {announcement}
       </div>
 
-      <main class="main-content" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`} tabIndex={0}>
-        {activeTab === 'grid' && !activeRun && (
-          <div class="welcome">
-            <h1>Welcome to Blind Keeper</h1>
-            <p>Track your Balatro boss blinds across runs.</p>
-            <button
-              class="btn btn--primary"
-              onClick={() => setActiveTab('runs')}
-              aria-label="Create a new run"
-            >
-              New Run
-            </button>
-          </div>
-        )}
+      <main class="main-content">
+        <div
+          role="tabpanel"
+          id="tabpanel-grid"
+          aria-labelledby="tab-grid"
+          tabIndex={activeTab === 'grid' ? 0 : -1}
+          hidden={activeTab !== 'grid'}
+        >
+          {!activeRun && (
+            <div class="welcome">
+              <h1>Welcome to Blind Keeper</h1>
+              <p>Track your Balatro boss blinds across runs.</p>
+              <button
+                class="btn btn--primary"
+                onClick={() => setActiveTab('runs')}
+                aria-label="Create a new run"
+              >
+                New Run
+              </button>
+            </div>
+          )}
 
-        {activeTab === 'grid' && activeRun && (
-          <>
-            <BossPillList
-              label="Faced"
-              items={activeRun.entries.map((e) => ({
-                id: e.facedBoss,
-                subtitle: `(${e.anteNumber})`,
-              }))}
-            />
-            <BossPillList
-              label="Rerolled"
-              items={rerolledBosses.map((id) => ({ id }))}
-            />
-            <BossGrid
-              eligibleBosses={eligibleBosses}
-              rerolledBosses={rerolledBosses}
-              onFace={handleFace}
-              onReroll={handleReroll}
-            />
-          </>
-        )}
+          {activeRun && (
+            <>
+              <BossPillList
+                label="Faced"
+                items={activeRun.entries.map((e) => ({
+                  id: e.facedBoss,
+                  subtitle: `(${e.anteNumber})`,
+                }))}
+              />
+              <BossPillList
+                label="Rerolled"
+                items={rerolledBosses.map((id) => ({ id }))}
+              />
+              <BossGrid
+                eligibleBosses={eligibleBosses}
+                rerolledBosses={rerolledBosses}
+                onFace={handleFace}
+                onReroll={handleReroll}
+              />
+            </>
+          )}
+        </div>
 
-        {activeTab === 'history' && activeRun && (
-          <History
-            run={activeRun}
-            onUndo={undoLastEntry}
-            onEditEntry={editEntry}
-            editingIndex={editingEntryIndex}
-            onSetEditingIndex={setEditingEntryIndex}
-          />
-        )}
+        <div
+          role="tabpanel"
+          id="tabpanel-history"
+          aria-labelledby="tab-history"
+          tabIndex={activeTab === 'history' ? 0 : -1}
+          hidden={activeTab !== 'history'}
+        >
+          {activeRun && (
+            <History
+              run={activeRun}
+              onUndo={undoLastEntry}
+              onEditEntry={editEntry}
+              editingIndex={editingEntryIndex}
+              onSetEditingIndex={setEditingEntryIndex}
+            />
+          )}
+        </div>
 
-        {activeTab === 'runs' && (
+        <div
+          role="tabpanel"
+          id="tabpanel-runs"
+          aria-labelledby="tab-runs"
+          tabIndex={activeTab === 'runs' ? 0 : -1}
+          hidden={activeTab !== 'runs'}
+        >
           <RunManager
             state={state}
             onCreateRun={createRun}
@@ -200,9 +222,17 @@ export function App() {
             onClearAll={clearAll}
             activeRunId={state.activeRunId}
           />
-        )}
+        </div>
 
-        {activeTab === 'about' && <About />}
+        <div
+          role="tabpanel"
+          id="tabpanel-about"
+          aria-labelledby="tab-about"
+          tabIndex={activeTab === 'about' ? 0 : -1}
+          hidden={activeTab !== 'about'}
+        >
+          <About />
+        </div>
       </main>
     </div>
   );
