@@ -19,13 +19,15 @@ export function BossPillList({ label, items }: BossPillListProps) {
       <span class="boss-pill-list__label">{label}:</span>
       {items.map((item, i) => (
         <span key={item.key ?? `${item.id}-${i}`} class="boss-pill">
-          <img
-            class="boss-pill__icon"
-            src={`/images/bosses/${item.id}.png`}
-            alt=""
-            width={20}
-            height={20}
-          />
+          {BOSS_MAP[item.id] && (
+            <img
+              class="boss-pill__icon"
+              src={`/images/bosses/${item.id}.png`}
+              alt=""
+              width={20}
+              height={20}
+            />
+          )}
           {BOSS_MAP[item.id]?.name ?? item.id}
           {item.subtitle && (
             <span class="boss-pill__subtitle">{item.subtitle}</span>

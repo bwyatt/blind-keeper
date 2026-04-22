@@ -33,11 +33,12 @@ describe('BossPillList', () => {
 
   it('falls back to id when boss is not in BOSS_MAP', () => {
     const items = [{ id: 'unknown-boss' }];
-    const { getByText } = render(
+    const { getByText, container } = render(
       <BossPillList label="Faced" items={items} />,
     );
 
     expect(getByText('unknown-boss')).toBeInTheDocument();
+    expect(container.querySelector('img')).toBeNull();
   });
 
   it('renders unique keys for duplicate boss ids', () => {
