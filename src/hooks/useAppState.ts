@@ -7,12 +7,39 @@ const MAX_COMPLETED_RUNS = 10;
 
 const DEFAULT_STATE: AppState = { activeRunId: null, runs: [] };
 
+function isValidAnteEntry(obj: unknown): boolean {
+  if (!obj || typeof obj !== 'object') return false;
+  const e = obj as Record<string, unknown>;
+  return (
+    typeof e.anteNumber === 'number' &&
+    typeof e.facedBoss === 'string' &&
+    Array.isArray(e.rerolledBosses) &&
+    (e.rerolledBosses as unknown[]).every((b) => typeof b === 'string')
+  );
+}
+
+function isValidRun(obj: unknown): boolean {
+  if (!obj || typeof obj !== 'object') return false;
+  const r = obj as Record<string, unknown>;
+  return (
+    typeof r.id === 'string' &&
+    typeof r.name === 'string' &&
+    typeof r.createdAt === 'string' &&
+    (r.status === 'active' || r.status === 'completed') &&
+    typeof r.currentAnte === 'number' &&
+    typeof r.anteDecrements === 'number' &&
+    Array.isArray(r.entries) &&
+    (r.entries as unknown[]).every(isValidAnteEntry)
+  );
+}
+
 function isValidState(obj: unknown): obj is AppState {
   if (!obj || typeof obj !== 'object') return false;
   const s = obj as Record<string, unknown>;
   return (
     (s.activeRunId === null || typeof s.activeRunId === 'string') &&
-    Array.isArray(s.runs)
+    Array.isArray(s.runs) &&
+    (s.runs as unknown[]).every(isValidRun)
   );
 }
 

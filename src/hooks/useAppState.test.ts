@@ -217,6 +217,132 @@ describe('useAppState', () => {
     expect(result.current.activeRun?.name).toBe('Preloaded');
   });
 
+  it('falls back to default state when localStorage contains a non-object', () => {
+    localStorage.setItem('blind-keeper-data', '"not-an-object"');
+    const { result } = renderHook(() => useAppState());
+    expect(result.current.state).toEqual({ activeRunId: null, runs: [] });
+  });
+
+  it('falls back to default state when runs is not an array', () => {
+    localStorage.setItem(
+      'blind-keeper-data',
+      JSON.stringify({ activeRunId: null, runs: 'bad' }),
+    );
+    const { result } = renderHook(() => useAppState());
+    expect(result.current.state).toEqual({ activeRunId: null, runs: [] });
+  });
+
+  it('falls back to default state when a run has wrong types', () => {
+    localStorage.setItem(
+      'blind-keeper-data',
+      JSON.stringify({ activeRunId: null, runs: [1, 2, 3] }),
+    );
+    const { result } = renderHook(() => useAppState());
+    expect(result.current.state).toEqual({ activeRunId: null, runs: [] });
+  });
+
+  it('falls back to default state when a run is missing required fields', () => {
+    localStorage.setItem(
+      'blind-keeper-data',
+      JSON.stringify({
+        activeRunId: null,
+        runs: [{ id: 'x', name: 'Missing fields' }],
+      }),
+    );
+    const { result } = renderHook(() => useAppState());
+    expect(result.current.state).toEqual({ activeRunId: null, runs: [] });
+  });
+
+  it('falls back to default state when a run has invalid status', () => {
+    localStorage.setItem(
+      'blind-keeper-data',
+      JSON.stringify({
+        activeRunId: null,
+        runs: [
+          {
+            id: 'x',
+            name: 'Bad status',
+            createdAt: new Date().toISOString(),
+            status: 'unknown',
+            currentAnte: 1,
+            anteDecrements: 0,
+            entries: [],
+          },
+        ],
+      }),
+    );
+    const { result } = renderHook(() => useAppState());
+    expect(result.current.state).toEqual({ activeRunId: null, runs: [] });
+  });
+
+  it('falls back to default state when an entry has wrong types', () => {
+    localStorage.setItem(
+      'blind-keeper-data',
+      JSON.stringify({
+        activeRunId: null,
+        runs: [
+          {
+            id: 'x',
+            name: 'Bad entry',
+            createdAt: new Date().toISOString(),
+            status: 'active',
+            currentAnte: 1,
+            anteDecrements: 0,
+            entries: [{ anteNumber: 'bad', facedBoss: 123, rerolledBosses: [] }],
+          },
+        ],
+      }),
+    );
+    const { result } = renderHook(() => useAppState());
+    expect(result.current.state).toEqual({ activeRunId: null, runs: [] });
+  });
+
+  it('falls back to default state when rerolledBosses contains non-strings', () => {
+    localStorage.setItem(
+      'blind-keeper-data',
+      JSON.stringify({
+        activeRunId: null,
+        runs: [
+          {
+            id: 'x',
+            name: 'Bad rerolled',
+            createdAt: new Date().toISOString(),
+            status: 'active',
+            currentAnte: 1,
+            anteDecrements: 0,
+            entries: [{ anteNumber: 1, facedBoss: 'boss', rerolledBosses: [42] }],
+          },
+        ],
+      }),
+    );
+    const { result } = renderHook(() => useAppState());
+    expect(result.current.state).toEqual({ activeRunId: null, runs: [] });
+  });
+
+  it('loads valid state with entries from localStorage', () => {
+    const preloadedState = {
+      activeRunId: 'r1',
+      runs: [
+        {
+          id: 'r1',
+          name: 'Full run',
+          createdAt: new Date().toISOString(),
+          status: 'active',
+          currentAnte: 3,
+          anteDecrements: 1,
+          entries: [
+            { anteNumber: 1, facedBoss: 'boss-a', rerolledBosses: ['boss-b'] },
+          ],
+        },
+      ],
+    };
+    localStorage.setItem('blind-keeper-data', JSON.stringify(preloadedState));
+    const { result } = renderHook(() => useAppState());
+    expect(result.current.state.runs).toHaveLength(1);
+    expect(result.current.state.runs[0].entries).toHaveLength(1);
+    expect(result.current.state.runs[0].entries[0].facedBoss).toBe('boss-a');
+  });
+
   it('updateRun replaces a run by id', () => {
     const { result } = renderHook(() => useAppState());
 
