@@ -22,7 +22,7 @@ export function BossPillList({ label, items }: BossPillListProps) {
           {BOSS_MAP[item.id] && (
             <img
               class="boss-pill__icon"
-              src={BOSS_MAP[item.id].icon}
+              src={`${import.meta.env.BASE_URL}${BOSS_MAP[item.id].icon}`}
               alt=""
               width={20}
               height={20}

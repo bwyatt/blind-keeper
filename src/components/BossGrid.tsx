@@ -118,7 +118,7 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
       {boss.id in BOSS_MAP && (
         <img
           class="boss-card__icon"
-          src={boss.icon}
+          src={`${import.meta.env.BASE_URL}${boss.icon}`}
           alt=""
           width={64}
           height={64}
