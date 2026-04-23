@@ -4,9 +4,9 @@ import { BossGrid } from './BossGrid.tsx';
 import type { BossBlind } from '../data/bosses.ts';
 
 const sampleBosses: BossBlind[] = [
-  { id: 'the-hook', name: 'The Hook', minAnte: 1, isShowdown: false },
-  { id: 'the-club', name: 'The Club', minAnte: 1, isShowdown: false },
-  { id: 'the-psychic', name: 'The Psychic', minAnte: 1, isShowdown: false },
+  { id: 'the-hook', name: 'The Hook', minAnte: 1, isShowdown: false, icon: 'images/bosses/the-hook.png' },
+  { id: 'the-club', name: 'The Club', minAnte: 1, isShowdown: false, icon: 'images/bosses/the-club.png' },
+  { id: 'the-psychic', name: 'The Psychic', minAnte: 1, isShowdown: false, icon: 'images/bosses/the-psychic.png' },
 ];
 
 describe('BossGrid', () => {
