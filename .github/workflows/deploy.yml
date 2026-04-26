@@ -61,6 +61,7 @@ jobs:
           } else {
             "exists=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           }
+          exit 0
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract changelog for version
