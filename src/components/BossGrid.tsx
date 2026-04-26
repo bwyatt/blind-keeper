@@ -47,6 +47,8 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
   const [pressing, setPressing] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
+  const interactionCanceled = useRef(false);
+  const actionConsumed = useRef(false);
   const startPos = useRef<{ x: number; y: number } | null>(null);
 
   const clearTimer = useCallback(() => {
@@ -63,10 +65,16 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
 
   const handlePointerDown = useCallback((e: PointerEvent) => {
     didLongPress.current = false;
+    interactionCanceled.current = false;
+    actionConsumed.current = false;
     startPos.current = { x: e.clientX, y: e.clientY };
     setPressing(true);
     timerRef.current = setTimeout(() => {
+      if (interactionCanceled.current || actionConsumed.current) {
+        return;
+      }
       didLongPress.current = true;
+      actionConsumed.current = true;
       setPressing(false);
       onReroll(boss.id);
     }, 500);
@@ -77,6 +85,7 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
     const dx = e.clientX - startPos.current.x;
     const dy = e.clientY - startPos.current.y;
     if (Math.sqrt(dx * dx + dy * dy) > LONG_PRESS_MOVE_THRESHOLD) {
+      interactionCanceled.current = true;
       clearTimer();
       setPressing(false);
     }
@@ -85,19 +94,32 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
   const handlePointerUp = useCallback(() => {
     clearTimer();
     setPressing(false);
-    if (!didLongPress.current) {
+    if (!didLongPress.current && !interactionCanceled.current && !actionConsumed.current) {
+      actionConsumed.current = true;
       onFace(boss.id);
     }
+    interactionCanceled.current = false;
+    actionConsumed.current = false;
+    didLongPress.current = false;
+    startPos.current = null;
   }, [boss.id, onFace, clearTimer]);
 
   const handlePointerCancel = useCallback(() => {
+    interactionCanceled.current = true;
     clearTimer();
     setPressing(false);
+    didLongPress.current = false;
+    actionConsumed.current = false;
+    startPos.current = null;
   }, [clearTimer]);
 
   const handlePointerLeave = useCallback(() => {
+    interactionCanceled.current = true;
     clearTimer();
     setPressing(false);
+    didLongPress.current = false;
+    actionConsumed.current = false;
+    startPos.current = null;
   }, [clearTimer]);
 
   const handleKeyDown = useCallback(

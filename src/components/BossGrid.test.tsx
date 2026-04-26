@@ -99,4 +99,79 @@ describe('BossGrid', () => {
     fireEvent.keyDown(touchArea, { key: 'Enter' });
     expect(onFace).toHaveBeenCalledWith('the-hook');
   });
+
+  it('does not trigger face or reroll on swipe movement beyond threshold', () => {
+    const onFace = vi.fn();
+    const onReroll = vi.fn();
+    const { getByLabelText } = render(
+      <BossGrid
+        eligibleBosses={sampleBosses}
+        rerolledBosses={[]}
+        onFace={onFace}
+        onReroll={onReroll}
+      />,
+    );
+
+    const touchArea = getByLabelText(
+      'The Hook. Tap to face, long press to reroll',
+    );
+
+    fireEvent.pointerDown(touchArea, { clientX: 10, clientY: 10 });
+    fireEvent.pointerMove(touchArea, { clientX: 30, clientY: 30 });
+    fireEvent.pointerUp(touchArea);
+
+    expect(onFace).not.toHaveBeenCalled();
+    expect(onReroll).not.toHaveBeenCalled();
+  });
+
+  it('fires reroll once on long press and does not face on pointer up', () => {
+    vi.useFakeTimers();
+
+    const onFace = vi.fn();
+    const onReroll = vi.fn();
+    const { getByLabelText } = render(
+      <BossGrid
+        eligibleBosses={sampleBosses}
+        rerolledBosses={[]}
+        onFace={onFace}
+        onReroll={onReroll}
+      />,
+    );
+
+    const touchArea = getByLabelText(
+      'The Hook. Tap to face, long press to reroll',
+    );
+
+    fireEvent.pointerDown(touchArea, { clientX: 10, clientY: 10 });
+    vi.advanceTimersByTime(500);
+    fireEvent.pointerUp(touchArea);
+
+    expect(onReroll).toHaveBeenCalledTimes(1);
+    expect(onReroll).toHaveBeenCalledWith('the-hook');
+    expect(onFace).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
+
+  it('still faces on quick tap without movement', () => {
+    const onFace = vi.fn();
+    const { getByLabelText } = render(
+      <BossGrid
+        eligibleBosses={sampleBosses}
+        rerolledBosses={[]}
+        onFace={onFace}
+        onReroll={() => {}}
+      />,
+    );
+
+    const touchArea = getByLabelText(
+      'The Hook. Tap to face, long press to reroll',
+    );
+
+    fireEvent.pointerDown(touchArea, { clientX: 10, clientY: 10 });
+    fireEvent.pointerUp(touchArea);
+
+    expect(onFace).toHaveBeenCalledTimes(1);
+    expect(onFace).toHaveBeenCalledWith('the-hook');
+  });
 });
