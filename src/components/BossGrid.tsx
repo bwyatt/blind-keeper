@@ -92,6 +92,7 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
   }, [clearTimer]);
 
   const handlePointerUp = useCallback(() => {
+    if (!startPos.current) return;
     clearTimer();
     setPressing(false);
     if (!didLongPress.current && !interactionCanceled.current && !actionConsumed.current) {

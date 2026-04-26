@@ -1,5 +1,6 @@
-import { render, fireEvent } from '@testing-library/preact';
-import { describe, it, expect, vi } from 'vitest';
+import { render, fireEvent, act } from '@testing-library/preact';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { useState } from 'preact/hooks';
 import { BossGrid } from './BossGrid.tsx';
 import type { BossBlind } from '../data/bosses.ts';
 
@@ -10,6 +11,10 @@ const sampleBosses: BossBlind[] = [
 ];
 
 describe('BossGrid', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('renders all eligible bosses', () => {
     const { getByText } = render(
       <BossGrid
@@ -124,33 +129,50 @@ describe('BossGrid', () => {
     expect(onReroll).not.toHaveBeenCalled();
   });
 
-  it('fires reroll once on long press and does not face on pointer up', () => {
+  it('fires reroll once on long press and does not face when pointer up lands on newly-exposed boss', () => {
     vi.useFakeTimers();
 
     const onFace = vi.fn();
     const onReroll = vi.fn();
-    const { getByLabelText } = render(
-      <BossGrid
-        eligibleBosses={sampleBosses}
-        rerolledBosses={[]}
-        onFace={onFace}
-        onReroll={onReroll}
-      />,
-    );
 
-    const touchArea = getByLabelText(
+    function StatefulBossGrid() {
+      const [rerolledBosses, setRerolledBosses] = useState<string[]>([]);
+      return (
+        <BossGrid
+          eligibleBosses={sampleBosses}
+          rerolledBosses={rerolledBosses}
+          onFace={onFace}
+          onReroll={(id) => {
+            onReroll(id);
+            setRerolledBosses((prev) => [...prev, id]);
+          }}
+        />
+      );
+    }
+
+    const { getByLabelText, queryByLabelText } = render(<StatefulBossGrid />);
+
+    const hookTouchArea = getByLabelText(
       'The Hook. Tap to face, long press to reroll',
     );
 
-    fireEvent.pointerDown(touchArea, { clientX: 10, clientY: 10 });
-    vi.advanceTimersByTime(500);
-    fireEvent.pointerUp(touchArea);
+    // Long press on The Hook triggers a reroll, removing The Hook from the grid
+    fireEvent.pointerDown(hookTouchArea, { clientX: 10, clientY: 10 });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
 
+    expect(queryByLabelText('The Hook. Tap to face, long press to reroll')).toBeNull();
     expect(onReroll).toHaveBeenCalledTimes(1);
     expect(onReroll).toHaveBeenCalledWith('the-hook');
-    expect(onFace).not.toHaveBeenCalled();
 
-    vi.useRealTimers();
+    // The subsequent pointerUp lands on The Club, now exposed after the reroll
+    const clubTouchArea = getByLabelText(
+      'The Club. Tap to face, long press to reroll',
+    );
+    fireEvent.pointerUp(clubTouchArea);
+
+    expect(onFace).not.toHaveBeenCalled();
   });
 
   it('still faces on quick tap without movement', () => {
