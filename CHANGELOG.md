@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-04-26
+
+### Fixed
+
+- Fixed a mobile interaction bug where swiping on a boss card could incorrectly mark that boss as faced (Issue #7)
+- Fixed a mobile interaction bug where a long-press reroll could be followed by an unintended boss action on finger release (Issue #8)
+
 ## [1.0.0] - 2026-04-21
 
 ### Added
@@ -38,5 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Release validation CI check for PRs targeting main (version increment, changelog entry, empty Unreleased section)
 - CHANGELOG.md following Keep a Changelog 1.1.0 conventions
 
-[Unreleased]: https://github.com/bwyatt/blind-keeper/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/bwyatt/blind-keeper/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/bwyatt/blind-keeper/releases/tag/v1.0.1
 [1.0.0]: https://github.com/bwyatt/blind-keeper/releases/tag/v1.0.0

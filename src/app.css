@@ -314,7 +314,7 @@
   position: absolute;
   inset: 0;
   cursor: pointer;
-  touch-action: none;
+  touch-action: pan-y;
   -webkit-user-select: none;
   user-select: none;
   z-index: 1;
