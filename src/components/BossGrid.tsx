@@ -64,6 +64,8 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
   }, [clearTimer]);
 
   const handlePointerDown = useCallback((e: PointerEvent) => {
+    if (startPos.current) return;
+    clearTimer();
     didLongPress.current = false;
     interactionCanceled.current = false;
     actionConsumed.current = false;
@@ -78,7 +80,7 @@ function BossCard({ boss, onFace, onReroll }: BossCardProps) {
       setPressing(false);
       onReroll(boss.id);
     }, 500);
-  }, [boss.id, onReroll]);
+  }, [boss.id, onReroll, clearTimer]);
 
   const handlePointerMove = useCallback((e: PointerEvent) => {
     if (!startPos.current) return;
