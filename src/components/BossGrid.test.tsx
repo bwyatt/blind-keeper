@@ -106,6 +106,8 @@ describe('BossGrid', () => {
   });
 
   it('does not trigger face or reroll on swipe movement beyond threshold', () => {
+    vi.useFakeTimers();
+
     const onFace = vi.fn();
     const onReroll = vi.fn();
     const { getByLabelText } = render(
@@ -124,6 +126,14 @@ describe('BossGrid', () => {
     fireEvent.pointerDown(touchArea, { clientX: 10, clientY: 10 });
     fireEvent.pointerMove(touchArea, { clientX: 30, clientY: 30 });
     fireEvent.pointerUp(touchArea);
+
+    expect(onFace).not.toHaveBeenCalled();
+    expect(onReroll).not.toHaveBeenCalled();
+
+    // Advance past the long-press threshold to confirm the timer was actually canceled
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
 
     expect(onFace).not.toHaveBeenCalled();
     expect(onReroll).not.toHaveBeenCalled();
@@ -176,13 +186,16 @@ describe('BossGrid', () => {
   });
 
   it('still faces on quick tap without movement', () => {
+    vi.useFakeTimers();
+
     const onFace = vi.fn();
+    const onReroll = vi.fn();
     const { getByLabelText } = render(
       <BossGrid
         eligibleBosses={sampleBosses}
         rerolledBosses={[]}
         onFace={onFace}
-        onReroll={() => {}}
+        onReroll={onReroll}
       />,
     );
 
@@ -195,5 +208,12 @@ describe('BossGrid', () => {
 
     expect(onFace).toHaveBeenCalledTimes(1);
     expect(onFace).toHaveBeenCalledWith('the-hook');
+
+    // Advance past the long-press threshold to confirm the timer was canceled by pointerUp
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
+
+    expect(onReroll).not.toHaveBeenCalled();
   });
 });
