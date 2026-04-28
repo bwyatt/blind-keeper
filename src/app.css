@@ -134,13 +134,6 @@
   min-width: 0;
 }
 
-.top-bar__run-name {
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .top-bar__ante {
   font-size: 0.9rem;
   opacity: 0.8;

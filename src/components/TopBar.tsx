@@ -5,6 +5,7 @@ interface TopBarProps {
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
   onDecrementAnte: () => void;
+  onAbandonRun: () => void;
 }
 
 export function TopBar({
@@ -12,19 +13,24 @@ export function TopBar({
   theme,
   onToggleTheme,
   onDecrementAnte,
+  onAbandonRun,
 }: TopBarProps) {
   return (
     <header class="top-bar">
       <div class="top-bar__title">Blind Keeper</div>
       <div class="top-bar__center">
-        {run && (
-          <>
-            <span class="top-bar__run-name">{run.name}</span>
-            <span class="top-bar__ante">Ante {run.currentAnte}</span>
-          </>
-        )}
+        {run && <span class="top-bar__ante">Ante {run.currentAnte}</span>}
       </div>
       <div class="top-bar__actions">
+        {run && (
+          <button
+            class="btn btn--icon btn--danger"
+            onClick={onAbandonRun}
+            aria-label="Abandon run and start new"
+          >
+            🗑️
+          </button>
+        )}
         <button
           class="btn btn--icon"
           onClick={onDecrementAnte}

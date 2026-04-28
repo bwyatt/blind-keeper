@@ -43,6 +43,20 @@ export function App() {
     null,
   );
 
+  const handleAbandonRun = useCallback(() => {
+    if (!activeRun) return;
+    if (
+      !window.confirm(
+        'Abandon this run and start a new one? The current run will be permanently deleted.',
+      )
+    )
+      return;
+    const newRunName = `Run ${state.runs.length}`;
+    deleteRun(activeRun.id);
+    createRun(newRunName);
+    setActiveTab('grid');
+  }, [activeRun, state.runs.length, deleteRun, createRun]);
+
   // Clear rerolledBosses when activeRun or ante changes
   useEffect(() => {
     setRerolledBosses([]);
@@ -114,6 +128,7 @@ export function App() {
         theme={theme}
         onToggleTheme={toggleTheme}
         onDecrementAnte={decrementAnte}
+        onAbandonRun={handleAbandonRun}
       />
 
       <nav class="tab-bar" role="tablist" aria-label="Main navigation">
