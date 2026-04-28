@@ -51,7 +51,7 @@ export function App() {
       )
     )
       return;
-    const newRunName = `Run ${state.runs.length}`;
+    const newRunName = `Run ${state.runs.length + 1}`;
     deleteRun(activeRun.id);
     createRun(newRunName);
     setActiveTab('grid');
