@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/preact';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { TopBar } from './TopBar.tsx';
 import type { Run } from '../types.ts';
 
@@ -53,16 +53,6 @@ describe('TopBar', () => {
   });
 
   describe('abandon run button', () => {
-    let confirmSpy: ReturnType<typeof vi.spyOn>;
-
-    beforeEach(() => {
-      confirmSpy = vi.spyOn(window, 'confirm');
-    });
-
-    afterEach(() => {
-      confirmSpy.mockRestore();
-    });
-
     it('calls onAbandonRun when abandon button is clicked', () => {
       const props = defaultProps();
       const run = makeRun();
