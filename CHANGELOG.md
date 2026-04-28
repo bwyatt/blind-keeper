@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-04-28
+
+### Added
+
+- Abandon-run shortcut button (🗑️) in the top bar — confirms with the user, deletes the active run, and immediately starts a new generic run
+
+### Changed
+
+- Run name no longer shown in the top bar; only the current Ante is displayed in the center
+
 ## [1.0.1] - 2026-04-26
 
 ### Fixed
@@ -45,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Release validation CI check for PRs targeting main (version increment, changelog entry, empty Unreleased section)
 - CHANGELOG.md following Keep a Changelog 1.1.0 conventions
 
-[Unreleased]: https://github.com/bwyatt/blind-keeper/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/bwyatt/blind-keeper/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/bwyatt/blind-keeper/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/bwyatt/blind-keeper/releases/tag/v1.0.1
 [1.0.0]: https://github.com/bwyatt/blind-keeper/releases/tag/v1.0.0
