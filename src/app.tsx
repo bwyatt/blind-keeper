@@ -67,6 +67,12 @@ export function App() {
     [activeRun],
   );
 
+  useEffect(() => {
+    if (disabledTabs.has(activeTab)) {
+      setActiveTab('grid');
+    }
+  }, [activeTab, disabledTabs]);
+
   const handleTabKeyDown = useCallback(
     (e: KeyboardEvent) => {
       const navigableTabs = ALL_TABS.filter((t) => !disabledTabs.has(t));
